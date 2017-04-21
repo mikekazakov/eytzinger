@@ -19,7 +19,7 @@ addons: &addons
 matrix:
   include:
     # Clang 3.7
-    - env: CXX='clang++-3.7' CXXFLAGS='-std=c++11 -stdlib=libc++'
+    - env: COMPILER='clang++-3.7' CXXFLAGS='-std=c++11 -stdlib=libc++'
       addons:
         apt:
           packages: clang-3.7
@@ -72,5 +72,8 @@ matrix:
 
 #before_install:
 #  - sudo apt-get update -qq
+
+before_script:
+  - export CXX=$COMPILER
 
 script: make && make test
