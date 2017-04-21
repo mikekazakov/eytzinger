@@ -2,8 +2,7 @@ ifndef CXX
 CXX=clang++
 endif
 ifndef CXXFLAGS
-#CXXFLAGS=-std=c++11 -stdlib=libc++
-CXXFLAGS=-std=c++14 -v
+CXXFLAGS=-std=c++14
 endif
 INCLUDE=-I./fixed_eytzinger_map/include/ -I./external/Catch/include
 
