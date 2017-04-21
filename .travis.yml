@@ -14,11 +14,39 @@ addons: &addons
       - llvm-toolchain-precise-3.7
       - llvm-toolchain-precise
 
-
 matrix:
   include:
+    - env: COMPILER=g++-4.8 CXXFLAGS='-std=c++11 -v'
+      addons:
+        apt:
+          packages: g++-4.8
+          sources: *sources
+
+    - env: COMPILER=g++-4.8 CXXFLAGS='-std=c++14 -v'
+      addons:
+        apt:
+          packages: g++-4.8
+          sources: *sources
+
+    - env: COMPILER=g++-4.9 CXXFLAGS='-std=c++11 -v'
+      addons:
+        apt:
+          packages: g++-4.9
+          sources: *sources
+
+    - env: COMPILER=g++-4.9 CXXFLAGS='-std=c++14 -v'
+      addons:
+        apt:
+          packages: g++-4.9
+          sources: *sources
 
     - env: COMPILER='g++-5'  CXXFLAGS='-std=c++11 -v'
+      addons:
+        apt:
+          packages: g++-5
+          sources: *sources
+
+    - env: COMPILER='g++-5'  CXXFLAGS='-std=c++14 -v'
       addons:
         apt:
           packages: g++-5
