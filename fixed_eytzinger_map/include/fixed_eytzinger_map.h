@@ -242,11 +242,11 @@ fixed_eytzinger_map(std::initializer_list<value_type> _l,
     __m_keys(nullptr),
     __m_values(nullptr)
 {
-    std::vector< std::pair<_Key,_Value> > t{ std::begin(_l), std::end(_l) };
-    std::sort(t.begin(), t.end(), [](auto &_v1, auto &_v2) {
+    std::vector<value_type> t{ std::begin(_l), std::end(_l) };
+    std::sort(t.begin(), t.end(), [](const value_type &_v1, const value_type &_v2) {
         return _v1.first < _v2.first;
     });
-    t.erase( std::unique( t.begin(), t.end(), [](const auto &_v1, const auto &_v2){
+    t.erase( std::unique( t.begin(), t.end(), [](const value_type &_v1, const value_type &_v2){
         return _v1.first == _v2.first;
     }), t.end());
     
@@ -268,11 +268,11 @@ fixed_eytzinger_map<_Key, _Value, _Compare>::fixed_eytzinger_map(_InputIterator 
                         typename std::iterator_traits<_InputIterator>::reference>::
                         value,
                     "incompatible iterator type");
-    std::vector< std::pair<_Key,_Value> > t{ _begin, _end };
-    std::sort(std::begin(t), std::end(t), [](auto &_v1, auto &_v2) {
+    std::vector<value_type> t{ _begin, _end };
+    std::sort(std::begin(t), std::end(t), [](const value_type &_v1, const value_type &_v2) {
         return _v1.first < _v2.first;
     });
-    t.erase( std::unique( t.begin(), t.end(), [](const auto &_v1, const auto &_v2){
+    t.erase( std::unique( t.begin(), t.end(), [](const value_type &_v1, const value_type &_v2){
         return _v1.first == _v2.first;
     }), t.end());
 

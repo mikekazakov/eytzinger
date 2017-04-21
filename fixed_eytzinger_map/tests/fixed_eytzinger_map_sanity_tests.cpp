@@ -98,10 +98,10 @@ TEST_CASE( "Iterators cover whole data", "[fixed_eytzinger_map]" )
         d.emplace_back( i, i );
     
     fixed_eytzinger_map<int, int> e( begin(d), end(d) );
-    auto sum_map = std::accumulate(begin(e), end(e), 0, [](auto v1, const auto &v2){
+    auto sum_map = std::accumulate(begin(e), end(e), 0, [](int v1, const std::pair<int, int> &v2){
         return v1 + v2.second;
     });
-    auto sum_source = std::accumulate(begin(d), end(d), 0, [](auto v1, const auto &v2){
+    auto sum_source = std::accumulate(begin(d), end(d), 0, [](int v1, const std::pair<int, int> &v2){
         return v1 + v2.second;
     });
     CHECK( sum_map == sum_source );
@@ -179,6 +179,7 @@ TEST_CASE( "Supports move-only semantics", "[fixed_eytzinger_map]" )
     (void)g;
 }
 
+#if __cplusplus >= 201402L
 TEST_CASE( "Supports heteregenous lookup", "[fixed_eytzinger_map]" )
 {
     fixed_eytzinger_map<std::string, std::string, std::less<>>
@@ -192,6 +193,7 @@ TEST_CASE( "Supports heteregenous lookup", "[fixed_eytzinger_map]" )
     CHECK( a.at("c") == "c" );
     CHECK( a["b"] == "b" );
 }
+#endif
 
 TEST_CASE( "Removes duplicate keys", "[fixed_eytzinger_map]" )
 {
