@@ -12,17 +12,12 @@ addons: &addons
       - llvm-toolchain-precise-3.5
       - llvm-toolchain-precise-3.6
       - llvm-toolchain-precise-3.7
+      - llvm-toolchain-precise-3.8
       - llvm-toolchain-precise
 
 matrix:
   include:
     - env: COMPILER=g++-4.8 CXXFLAGS='-std=c++11 -v'
-      addons:
-        apt:
-          packages: g++-4.8
-          sources: *sources
-
-    - env: COMPILER=g++-4.8 CXXFLAGS='-std=c++14 -v'
       addons:
         apt:
           packages: g++-4.8
@@ -74,6 +69,18 @@ matrix:
       addons:
         apt:
           packages: clang-3.7
+          sources: *sources
+
+    - env: COMPILER='clang++-3.8' CXXFLAGS='-std=c++11 -v'
+      addons:
+        apt:
+          packages: clang-3.8
+          sources: *sources
+
+    - env: COMPILER='clang++-3.8' CXXFLAGS='-std=c++14 -v'
+      addons:
+        apt:
+          packages: clang-3.8
           sources: *sources
 
 before_script:
