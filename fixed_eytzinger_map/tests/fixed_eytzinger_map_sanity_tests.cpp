@@ -1,71 +1,96 @@
+#define CATCH_CONFIG_MAIN
+#include <catch.hpp>
 #include <vector>
 #include <string>
+#include <exception>
 #include <algorithm>
 #include <numeric>
-#include <assert.h>
 #include <fixed_eytzinger_map.h>
 
-static void test_basic_int_int()
+TEST_CASE( "Works with int->int", "[fixed_eytzinger_map]" )
 {
     std::vector< std::pair<int, int> > d;
     int n = 30;
     for( int i = 0; i < n; ++i )
         d.emplace_back( i, i );
-    fixed_eytzinger_map<int, int> e( std::begin(d), std::end(d) );
-
-    for( int i = 0; i < n; ++i )
-        assert( e.lower_bound(i)->first == i );
-
-    for( int i = 0; i < n-1; ++i )
-        assert( e.upper_bound(i)->first == i+1 );
-    assert( e.upper_bound(n) == e.end() );
-
-    for( int i = 0; i < n; ++i ) {
-        auto t = e.equal_range(i);
-        assert( t.first->first == i );
-        assert( std::distance(t.first, t.second) == 1 );
+    fixed_eytzinger_map<int, int> e{ std::begin(d), std::end(d) };
+    
+    SECTION( "size" ) {
+        CHECK( e.size() == d.size() );
+        CHECK( e.empty() == false );
     }
     
-    for( int i = 0; i < n; ++i ) {
-        assert( e.find(i) != e.end() && e.find(i)->first == i );
-        assert( e.at(i) == i );
-        assert( e[i] == i );
+    SECTION( "lower_bound" ) {
+        for( int i = 0; i < n; ++i ) {
+            REQUIRE( e.lower_bound(i) != e.end() );
+            CHECK( e.lower_bound(i)->first == i );
+        }
     }
-    for( int i = n; i < 2*n; ++i )
-        assert( e.find(i) == e.end() );
+    
+    SECTION( "upper_bound" ) {
+        for( int i = 0; i < n-1; ++i )
+            CHECK( e.upper_bound(i)->first == i+1 );
+        CHECK( e.upper_bound(n) == e.end() );
+    }
+    
+    SECTION( "equal_range" ) {
+        for( int i = 0; i < n; ++i ) {
+            auto t = e.equal_range(i);
+            CHECK( t.first->first == i );
+            CHECK( t.first->second == i );
+            CHECK( std::distance(t.first, t.second) == 1 );
+        }
+    }
+    
+    SECTION( "find" ) {
+        for( int i = 0; i < n; ++i ) {
+            REQUIRE( e.find(i) != e.end() );
+            CHECK( e.find(i)->first == i );
+            CHECK( e.at(i) == i );
+            CHECK( e[i] == i );
+        }
+        for( int i = n; i < 2*n; ++i )
+            CHECK( e.find(i) == e.end() );
+        for( int i = -2*n; i < 0; ++i )
+            CHECK( e.find(i) == e.end() );
+    }
 }
 
-static void test_basic_int_string()
+TEST_CASE( "Works with int->string", "[fixed_eytzinger_map]" )
 {
     std::vector< std::pair<int, std::string> > d;
     int n = 30;
     for( int i = 0; i < n; ++i )
         d.emplace_back( i, std::to_string(i) );
     
-    fixed_eytzinger_map<int, std::string> e( std::begin(d), std::end(d) );
-
-    for( int i = 0; i < n; ++i )
-        assert( e.lower_bound(i)->first == i );
+    fixed_eytzinger_map<int, std::string> e{ std::begin(d), std::end(d) };
 
     for( int i = 0; i < n; ++i ) {
-        assert( e.find(i) != e.end() && e.find(i)->first == i );
-        assert( e.at(i) == std::to_string(i) );
-        assert( e[i] == std::to_string(i) );
+        REQUIRE( e.lower_bound(i) != e.end() );
+        CHECK( e.lower_bound(i)->first == i );
+    }
+
+    for( int i = 0; i < n; ++i ) {
+        REQUIRE( e.find(i) != e.end() );
+        CHECK( e.find(i)->first == i );
+        CHECK( e.at(i) == std::to_string(i) );
+        CHECK( e[i] == std::to_string(i) );
     }
     for( int i = n; i < 2*n; ++i )
-        assert( e.find(i) == e.end() );
+        CHECK( e.find(i) == e.end() );
 }
 
-static void test_empty()
+
+TEST_CASE( "Has a valid empty semantics", "[fixed_eytzinger_map]" )
 {
     fixed_eytzinger_map<int, int> m;
-    assert( m.size() == 0 );
-    assert( m.empty() );
-    assert( m.count(42) == 0 );
-    assert( begin(m) == end(m) );
+    CHECK( m.size() == 0 );
+    CHECK( m.empty() );
+    CHECK( m.count(42) == 0 );
+    CHECK( begin(m) == end(m) );
 }
 
-static void test_iteration()
+TEST_CASE( "Iterators cover whole data", "[fixed_eytzinger_map]" )
 {
     std::vector< std::pair<int, int> > d;
     int n = 30;
@@ -73,52 +98,51 @@ static void test_iteration()
         d.emplace_back( i, i );
     
     fixed_eytzinger_map<int, int> e( begin(d), end(d) );
-    assert(
-        std::accumulate(begin(e), end(e), 0, [](auto v1, const auto &v2){
-            return v1 + v2.second;
-        }) ==
-        std::accumulate(begin(d), end(d), 0, [](auto v1, const auto &v2){
-            return v1 + v2.second;
-        })
-        );
+    auto sum_map = std::accumulate(begin(e), end(e), 0, [](auto v1, const auto &v2){
+        return v1 + v2.second;
+    });
+    auto sum_source = std::accumulate(begin(d), end(d), 0, [](auto v1, const auto &v2){
+        return v1 + v2.second;
+    });
+    CHECK( sum_map == sum_source );
 }
 
-static void test_copy_and_move_semantics()
+TEST_CASE( "Supports copy and move semantics", "[fixed_eytzinger_map]" )
 {
     fixed_eytzinger_map<int, int> a( {{0,0}, {1,0}} );
-    assert( a.size() == 2 );
-    fixed_eytzinger_map<int, int> b( move(a) );
-    assert( a.size() == 0 );
-    assert( b.size() == 2 );
+    CHECK( a.size() == 2 );
+    fixed_eytzinger_map<int, int> b( std::move(a) );
+    CHECK( a.size() == 0 );
+    CHECK( b.size() == 2 );
     
     fixed_eytzinger_map<int, int> c( b );
-    assert( c.size() == 2 );
-    assert( b.size() == 2 );
+    CHECK( c.size() == 2 );
+    CHECK( b.size() == 2 );
     
     fixed_eytzinger_map<int, int> d;
     d = c;
-    assert( d.size() == 2 );
-    assert( d == c );
+    CHECK( d.size() == 2 );
+    CHECK( d == c );
     
     fixed_eytzinger_map<int, int> e;
-    e = move(d);
-    assert( d.size() == 0 );
-    assert( e.size() == 2 );
+    e = std::move(d);
+    CHECK( d.size() == 0 );
+    CHECK( e.size() == 2 );
     
     d = {{0,0}, {1,0}, {2,0}};
-    assert( d.size() == 3 );
+    CHECK( d.size() == 3 );
     d.assign( begin(e), end(e) );
-    assert( d.size() == 2 );
+    CHECK( d.size() == 2 );
 }
 
-static void test_move_semantics()
+TEST_CASE( "Supports move-only semantics", "[fixed_eytzinger_map]" )
 {
     struct A
     {
         A(int){};
-        A(const A&){ assert(0); }
+        A(const A&){ REQUIRE(false); }
         A(A&&) noexcept {}
-        A& operator=(const A&){ assert(0);}
+        A& operator=(const A&){ REQUIRE(false); throw std::logic_error(""); }
         A& operator=(A&&) noexcept { return *this; }
     };
 
@@ -131,20 +155,20 @@ static void test_move_semantics()
     fixed_eytzinger_map<int, A> a(  std::make_move_iterator(d.begin()),
                                     std::make_move_iterator(d.end())
                                 );
-    assert( a.size() == 4 );
+    CHECK( a.size() == 4 );
     const A &z = a[0];
     (void)z;
     
-    fixed_eytzinger_map<int, A> b( move(a) );
-    assert( a.size() == 0 );
-    assert( b.size() == 4 );
+    fixed_eytzinger_map<int, A> b( std::move(a) );
+    CHECK( a.size() == 0 );
+    CHECK( b.size() == 4 );
     
     std::swap( a, b );
-    assert( a.size() == 4 );
-    assert( b.size() == 0 );
+    CHECK( a.size() == 4 );
+    CHECK( b.size() == 0 );
     
     a.clear();
-    assert( a.size() == 0 );
+    CHECK( a.size() == 0 );
     
     std::vector< std::pair<std::string, A> > e;
     e.emplace_back( std::make_pair("Abra", A(0)) );
@@ -155,28 +179,27 @@ static void test_move_semantics()
     (void)g;
 }
 
-static void test_heteregenous_lookup()
+TEST_CASE( "Supports heteregenous lookup", "[fixed_eytzinger_map]" )
 {
     fixed_eytzinger_map<std::string, std::string, std::less<>>
         a( {{"a", "a"}, {"b", "b"}, {"c", "c"}} );
  
-    assert( a.lower_bound("a")->second == "a" );
-    assert( a.upper_bound("a")->second == "b" );
-    assert( a.find("a")->second == "a" );
-    assert( a.count("a") == 1 );
-    assert( a.count("z") == 0 );
-    assert( a.at("c") == "c" );
-    assert( a["b"] == "b" );
+    CHECK( a.lower_bound("a")->second == "a" );
+    CHECK( a.upper_bound("a")->second == "b" );
+    CHECK( a.find("a")->second == "a" );
+    CHECK( a.count("a") == 1 );
+    CHECK( a.count("z") == 0 );
+    CHECK( a.at("c") == "c" );
+    CHECK( a["b"] == "b" );
 }
 
-int main()
+TEST_CASE( "Removes duplicate keys", "[fixed_eytzinger_map]" )
 {
-    test_basic_int_int();
-    test_basic_int_string();
-    test_empty();
-    test_iteration();
-    test_copy_and_move_semantics();
-    test_move_semantics();
-    test_heteregenous_lookup();
-    return 0;
+    fixed_eytzinger_map<std::string, std::string> a(
+        {{"a", "a"}, {"a", "a"}, {"b", "b"}, {"b", "b"}, {"c", "c"}, {"c", "c"}} );
+    
+    CHECK( a.size() == 3 );
+    CHECK( a["a"] == "a" );
+    CHECK( a["b"] == "b" );
+    CHECK( a["c"] == "c" );
 }
