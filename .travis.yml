@@ -1,13 +1,11 @@
 language: cpp
 sudo: false
-compiler: clang
 
-# gcc 4.9 default
 addons: &addons
   apt:
     packages: &packages
       - g++-4.9
-#      - python-pip
+
     sources: &sources
       - ubuntu-toolchain-r-test
       - llvm-toolchain-precise-3.5
@@ -18,60 +16,23 @@ addons: &addons
 
 matrix:
   include:
-    # Clang 3.7
+    - env: COMPILER='clang++-3.6' CXXFLAGS='-std=c++11 -v'
+      addons:
+        apt:
+          packages: clang-3.6
+          sources: *sources
+    
     - env: COMPILER='clang++-3.7' CXXFLAGS='-std=c++11 -v'
       addons:
         apt:
           packages: clang-3.7
           sources: *sources
-              #   env:
-    #     global:
-    #       - 
-    #       - 
 
-#    - compiler: gcc
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#          packages:
-#            - g++-4.9
-#      env: COMPILER=g++-4.9
-#    - compiler: gcc
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#          packages:
-#            - g++-5
-#      env: COMPILER=g++-5
-#    - compiler: clang
-#      addons:
-    #     apt:
-    #       sources:
-    #         - ubuntu-toolchain-r-test
-    #         - llvm-toolchain-precise-3.6
-    #       packages:
-    #         - clang-3.6
-    #   env:
-    #     global:
-    #       - CXX='clang++-3.6'
-    #       - CXXFLAGS='-std=c++11 -stdlib=libc++'
-    # - compiler: clang
-    #   addons:
-    #     apt:
-    #       sources:
-    #         - ubuntu-toolchain-r-test
-    #         - llvm-toolchain-precise-3.7
-    #       packages:
-    #         - clang-3.7
-    #   env:
-    #     global:
-    #       - CXX='clang++-3.7'
-    #       - CXXFLAGS='-std=c++11 -stdlib=libc++'
-
-#before_install:
-#  - sudo apt-get update -qq
+    - env: COMPILER='clang++-3.7' CXXFLAGS='-std=c++14 -v'
+      addons:
+        apt:
+          packages: clang-3.7
+          sources: *sources
 
 before_script:
   - export CXX=$COMPILER
