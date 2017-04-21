@@ -3,7 +3,9 @@
 
 sudo: required
 dist: precise
-language: cpp
+#dist: trusty
+
+#language: cpp
 
 matrix:
   include:
