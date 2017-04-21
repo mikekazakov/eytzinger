@@ -31,8 +31,7 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
-      env: CXX=clang++-3.6
-      env: CXXFLAGS=-std=c++11 -stdlib=libc++      
+      env: CXX=clang++-3.6 CXXFLAGS=-std=c++11\ -stdlib=libc++
     - compiler: clang
       addons:
         apt:
@@ -41,8 +40,7 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
-      env: CXX=clang++-3.7
-      env: CXXFLAGS=-std=c++11 -stdlib=libc++
+      env: CXX=clang++-3.7 CXXFLAGS=-std=c++11\ -stdlib=libc++
 
 before_install:
   - sudo apt-get update -qq
