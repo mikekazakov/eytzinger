@@ -164,7 +164,7 @@ public:
     fixed_eytzinger_map& operator=( std::initializer_list<value_type> l );
     template<typename _InputIterator>
     void assign( _InputIterator begin, _InputIterator end );
-
+    void assign( std::initializer_list<value_type> l );
     
 private:
     void __alloc_init( size_t _count );
@@ -173,8 +173,11 @@ private:
     void __destroy_at( size_t _p ) noexcept;
     void __destroy_all() noexcept;
     bool __comp(const _Key& _v1, const _Key &_v2) const noexcept;
+    bool __equal(const _Key& _v1, const _Key &_v2) const noexcept;
     template <class _K1, class _K2>
     bool __comp2(const _K1& _v1, const _K2 &_v2) const noexcept;
+    template <class _K1, class _K2>
+    bool __equal2(const _K1& _v1, const _K2 &_v2) const noexcept;
     value_type *__init_fill( size_t _base, value_type *_first);
     size_type    __m_count;
     key_type    *__m_keys;
@@ -243,11 +246,11 @@ fixed_eytzinger_map(std::initializer_list<value_type> _l,
     __m_values(nullptr)
 {
     std::vector<value_type> t{ std::begin(_l), std::end(_l) };
-    std::sort(t.begin(), t.end(), [](const value_type &_v1, const value_type &_v2) {
-        return _v1.first < _v2.first;
+    std::sort(t.begin(), t.end(), [this](const value_type &_v1, const value_type &_v2) {
+        return  __comp(_v1.first, _v2.first);
     });
-    t.erase( std::unique( t.begin(), t.end(), [](const value_type &_v1, const value_type &_v2){
-        return _v1.first == _v2.first;
+    t.erase( std::unique( t.begin(), t.end(), [this](const value_type &_v1, const value_type &_v2){
+        return __equal(_v1.first, _v2.first);
     }), t.end());
     
     __alloc_init( t.size() );
@@ -269,11 +272,11 @@ fixed_eytzinger_map<_Key, _Value, _Compare>::fixed_eytzinger_map(_InputIterator 
                         value,
                     "incompatible iterator type");
     std::vector<value_type> t{ _begin, _end };
-    std::sort(std::begin(t), std::end(t), [](const value_type &_v1, const value_type &_v2) {
-        return _v1.first < _v2.first;
+    std::sort(std::begin(t), std::end(t), [this](const value_type &_v1, const value_type &_v2) {
+        return __comp(_v1.first, _v2.first);
     });
-    t.erase( std::unique( t.begin(), t.end(), [](const value_type &_v1, const value_type &_v2){
-        return _v1.first == _v2.first;
+    t.erase( std::unique( t.begin(), t.end(), [this](const value_type &_v1, const value_type &_v2){
+        return __equal(_v1.first, _v2.first);
     }), t.end());
 
     __alloc_init( t.size() );
@@ -381,6 +384,12 @@ __comp(const _Key& _v1, const _Key &_v2) const noexcept
 {
     return _Compare::operator()(_v1, _v2);
 }
+template <typename _Key, typename _Value, typename _Compare>
+bool fixed_eytzinger_map<_Key, _Value, _Compare>::
+__equal(const _Key& _v1, const _Key &_v2) const noexcept
+{
+    return !__comp(_v1, _v2) && !__comp(_v2, _v1);
+}
 
 template <typename _Key, typename _Value, typename _Compare>
 template <class _K1, class _K2>
@@ -388,6 +397,14 @@ bool fixed_eytzinger_map<_Key, _Value, _Compare>::
 __comp2(const _K1& _v1, const _K2 &_v2) const noexcept
 {
     return _Compare::operator()(_v1, _v2);
+}
+
+template <typename _Key, typename _Value, typename _Compare>
+template <class _K1, class _K2>
+bool fixed_eytzinger_map<_Key, _Value, _Compare>::
+__equal2(const _K1& _v1, const _K2 &_v2) const noexcept
+{
+    return !_Compare::operator()(_v1, _v2) && !_Compare::operator()(_v2, _v1);
 }
 
 template <typename _Key, typename _Value, typename _Compare>
@@ -857,6 +874,14 @@ assign(_InputIterator _begin, _InputIterator _end)
                         value,
                     "incompatible iterator type");
     fixed_eytzinger_map __tmp {_begin, _end};
+    swap(__tmp);
+}
+
+template <typename _Key, typename _Value, typename _Compare>
+void fixed_eytzinger_map<_Key, _Value, _Compare>::
+assign( std::initializer_list<value_type> l )
+{
+    fixed_eytzinger_map __tmp {l};
     swap(__tmp);
 }
 
