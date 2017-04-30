@@ -21,4 +21,4 @@ build:
 
 test_script:
   - cd Build
-  - ctest -C %CONFIGURATION%
+  - ctest -V -C %CONFIGURATION%
