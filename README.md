@@ -1,4 +1,4 @@
-# fixed_eytzinger_map [![Build Status](https://travis-ci.org/mikekazakov/eytzinger.svg?branch=master)](https://travis-ci.org/mikekazakov/eytzinger)
+# fixed_eytzinger_map [![Build Status](https://travis-ci.org/mikekazakov/eytzinger.svg?branch=master)](https://travis-ci.org/mikekazakov/eytzinger) [![Build status](https://ci.appveyor.com/api/projects/status/0y8wt2mntxxsjrl4?svg=true)](https://ci.appveyor.com/project/mikekazakov/eytzinger)
 Cache-friendly associative container with an Eytzinger layout for C++11/14/17
 
 
