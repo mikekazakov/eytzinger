@@ -44,5 +44,7 @@ keys order: 3 1 5 0 2 4
 
 ## More
 Rationale and design notes: https://kazakov.life/2017/03/06/cache-friendly-associative-container/
+
 Thorough explanation of a lookup behaviour: http://bannalia.blogspot.com/2015/06/cache-friendly-binary-search.html
+
 Academic work on different array layouts: https://arxiv.org/ftp/arxiv/papers/1509/1509.05053.pdf
