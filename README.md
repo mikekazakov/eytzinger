@@ -12,7 +12,7 @@ Unlike std- or boost- associative containers, `fixed_eytzinger_map` can't be mod
 `fixed_eytzinger_map` supports heterogeneous lookup, either with `std::less<>` or using a custom comparator with an `is_transparent` tag.
 
 ## How to use it
-`fixed_eytzinger_map` comes in a form of a single header with no dependencies. This implementation is platform- and architecture agnostic. Just drop `fixed_eytzinger_map/include/fixed_eytzinger_map.h` to some reachable place and include this header:
+`fixed_eytzinger_map` comes in a form of a single header with no dependencies. This implementation is platform and architecture agnostic, it's being tested on clang/gcc/cl on x86 and x86-64. Just drop `fixed_eytzinger_map/include/fixed_eytzinger_map.h` to some reachable place and include this header:
 
 ```c++
 #include <iostream>
@@ -41,3 +41,8 @@ Hello, World!
 strlen = 14
 keys order: 3 1 5 0 2 4 
 ```
+
+## More
+Rationale and design notes: https://kazakov.life/2017/03/06/cache-friendly-associative-container/
+Thorough explanation of a lookup behaviour: http://bannalia.blogspot.com/2015/06/cache-friendly-binary-search.html
+Academic work on different array layouts: https://arxiv.org/ftp/arxiv/papers/1509/1509.05053.pdf
